@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ArrowRight, Check, Sparkles, Building2, BedDouble,
-  UtensilsCrossed, MapPin, Star, ChevronRight, Phone, Mail, User,
-  Globe, Calendar, MessageSquare, PartyPopper, RotateCcw, Heart,
-  MapPinned, Clock, Shield
+  UtensilsCrossed, MapPin, Star, Phone, Mail, User,
+  Globe, Calendar, MessageSquare, PartyPopper, RotateCcw,
+  MapPinned, Clock, Shield, X, ChevronRight, Users, Award,
+  Wifi, Dumbbell, Coffee, Car, Heart, Eye, ImageIcon
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTripStore, TRIP_TYPES } from '../store/useTripStore';
@@ -32,7 +33,6 @@ const stepLabels = {
   contact: { en: 'Contact', ko: '상담 신청' },
 };
 
-// Animation variants
 const pageVariants = {
   enter: { opacity: 0, x: 40 },
   center: { opacity: 1, x: 0 },
@@ -57,7 +57,6 @@ export default function CustomTripPage() {
   const steps = getSteps();
   const totalSteps = getTotalSteps();
 
-  // Redirect if no trip type selected
   useEffect(() => {
     if (!tripType) navigate('/');
   }, [tripType, navigate]);
@@ -75,8 +74,8 @@ export default function CustomTripPage() {
     switch (currentStepName) {
       case 'treatment': return selectedCategory && selectedHospital;
       case 'accommodation': return selectedAccommodation;
-      case 'dining': return true; // optional
-      case 'attractions': return true; // optional
+      case 'dining': return true;
+      case 'attractions': return true;
       case 'contact': return contactInfo.name && contactInfo.email && contactInfo.phone;
       default: return false;
     }
@@ -100,7 +99,6 @@ export default function CustomTripPage() {
       {/* Top Bar */}
       <div className="sticky top-12 md:top-14 z-30 bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4">
-          {/* Back + Title */}
           <div className="flex items-center gap-3 py-3">
             <button onClick={() => currentStep === 0 ? navigate('/') : prevStep()} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -120,7 +118,6 @@ export default function CustomTripPage() {
             </button>
           </div>
 
-          {/* Progress Bar */}
           <div className="h-1 bg-gray-100 rounded-full mb-1 overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
@@ -129,7 +126,6 @@ export default function CustomTripPage() {
             />
           </div>
 
-          {/* Step Indicators */}
           <div className="flex items-center gap-1 py-2 overflow-x-auto scrollbar-hide">
             {steps.map((step, i) => {
               const Icon = stepIcons[step];
@@ -146,11 +142,7 @@ export default function CustomTripPage() {
                     !isActive && !isDone && 'text-gray-300'
                   )}
                 >
-                  {isDone ? (
-                    <Check className="w-3 h-3 text-green-500" />
-                  ) : (
-                    <Icon className="w-3 h-3" />
-                  )}
+                  {isDone ? <Check className="w-3 h-3 text-green-500" /> : <Icon className="w-3 h-3" />}
                   <span>{stepLabels[step][lang]}</span>
                 </button>
               );
@@ -170,21 +162,11 @@ export default function CustomTripPage() {
             exit="exit"
             transition={{ duration: 0.3 }}
           >
-            {currentStepName === 'treatment' && (
-              <TreatmentStep lang={lang} />
-            )}
-            {currentStepName === 'accommodation' && (
-              <AccommodationStep lang={lang} />
-            )}
-            {currentStepName === 'dining' && (
-              <DiningStep lang={lang} />
-            )}
-            {currentStepName === 'attractions' && (
-              <AttractionsStep lang={lang} />
-            )}
-            {currentStepName === 'contact' && (
-              <ContactStep lang={lang} />
-            )}
+            {currentStepName === 'treatment' && <TreatmentStep lang={lang} />}
+            {currentStepName === 'accommodation' && <AccommodationStep lang={lang} />}
+            {currentStepName === 'dining' && <DiningStep lang={lang} />}
+            {currentStepName === 'attractions' && <AttractionsStep lang={lang} />}
+            {currentStepName === 'contact' && <ContactStep lang={lang} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -229,6 +211,104 @@ export default function CustomTripPage() {
 }
 
 /* ================================================
+   DETAIL BOTTOM SHEET
+   ================================================ */
+function DetailSheet({ isOpen, onClose, children }) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/40 z-[60]"
+          />
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-[61] bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto"
+          >
+            <div className="sticky top-0 bg-white z-10 pt-3 pb-2 px-5 border-b border-gray-50">
+              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-3" />
+              <button
+                onClick={onClose}
+                className="absolute right-4 top-4 p-1.5 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+            <div className="px-5 pb-8 pt-3">
+              {children}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ================================================
+   IMAGE GALLERY
+   ================================================ */
+function ImageGallery({ images, alt }) {
+  const [current, setCurrent] = useState(0);
+  return (
+    <div className="relative rounded-2xl overflow-hidden mb-4">
+      <img src={images[current]} alt={alt} className="w-full h-48 sm:h-56 object-cover" />
+      {images.length > 1 && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={cn(
+                'w-2 h-2 rounded-full transition-all',
+                i === current ? 'bg-white w-5' : 'bg-white/50'
+              )}
+            />
+          ))}
+        </div>
+      )}
+      <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/40 text-white text-[10px] px-2 py-0.5 rounded-full">
+        <ImageIcon className="w-3 h-3" />
+        {current + 1}/{images.length}
+      </div>
+    </div>
+  );
+}
+
+/* ================================================
+   STAR RATING
+   ================================================ */
+function StarRating({ rating, reviewCount, size = 'sm' }) {
+  const isSm = size === 'sm';
+  return (
+    <div className="flex items-center gap-1">
+      <Star className={cn('text-amber-400 fill-amber-400', isSm ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+      <span className={cn('font-bold text-gray-900', isSm ? 'text-xs' : 'text-sm')}>{rating}</span>
+      {reviewCount !== undefined && (
+        <span className={cn('text-gray-400', isSm ? 'text-[11px]' : 'text-xs')}>
+          ({reviewCount.toLocaleString()})
+        </span>
+      )}
+    </div>
+  );
+}
+
+/* ================================================
    STEP 1: Treatment Selection
    ================================================ */
 const categoryToSpecialties = {
@@ -244,6 +324,7 @@ const categoryToSpecialties = {
 
 function TreatmentStep({ lang }) {
   const { selectedCategory, selectedHospital, setSelectedCategory, setSelectedHospital } = useTripStore();
+  const [detailHospital, setDetailHospital] = useState(null);
 
   const filteredHospitals = selectedCategory
     ? (() => {
@@ -258,7 +339,7 @@ function TreatmentStep({ lang }) {
   return (
     <div className="space-y-5">
       {/* AI Tip */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-violet-50 rounded-xl">
+      <div className="flex items-center gap-2 px-3 py-2.5 bg-violet-50 rounded-xl">
         <Sparkles className="w-4 h-4 text-violet-500 shrink-0" />
         <p className="text-xs text-violet-700">
           {lang === 'ko'
@@ -289,9 +370,7 @@ function TreatmentStep({ lang }) {
                 <span className="text-xs font-semibold text-gray-900 block">{cat.name[lang] || cat.name.en}</span>
                 <span className="text-[10px] text-gray-400">{cat.packageCount} {lang === 'ko' ? '패키지' : 'pkgs'}</span>
               </div>
-              {selectedCategory === cat.id && (
-                <Check className="w-4 h-4 text-violet-500 ml-auto" />
-              )}
+              {selectedCategory === cat.id && <Check className="w-4 h-4 text-violet-500 ml-auto" />}
             </button>
           ))}
         </div>
@@ -299,54 +378,214 @@ function TreatmentStep({ lang }) {
 
       {/* Hospital Selection */}
       {selectedCategory && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <h3 className="text-sm font-bold text-gray-900 mb-3">
             {lang === 'ko' ? '병원을 선택해주세요' : 'Choose your hospital'}
+            <span className="text-[11px] text-gray-400 font-normal ml-2">
+              {filteredHospitals.length}{lang === 'ko' ? '곳' : ' available'}
+            </span>
           </h3>
-          <div className="space-y-2">
-            {filteredHospitals.map(hospital => (
-              <button
-                key={hospital.id}
-                onClick={() => setSelectedHospital(hospital.id)}
-                className={cn(
-                  'w-full flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all',
-                  selectedHospital === hospital.id
-                    ? 'border-violet-400 bg-violet-50'
-                    : 'border-gray-100 bg-white hover:border-gray-200'
-                )}
-              >
-                <img
-                  src={hospital.images[0]}
-                  alt={hospital.name}
-                  className="w-14 h-14 rounded-lg object-cover shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-bold text-gray-900 truncate">{hospital.name}</span>
-                    {hospital.certifications.includes('JCI') && (
-                      <Shield className="w-3 h-3 text-blue-500 shrink-0" />
-                    )}
+          <div className="space-y-3">
+            {filteredHospitals.map(hospital => {
+              const isSelected = selectedHospital === hospital.id;
+              return (
+                <div
+                  key={hospital.id}
+                  className={cn(
+                    'rounded-2xl border-2 bg-white overflow-hidden transition-all',
+                    isSelected ? 'border-violet-400 shadow-sm shadow-violet-100' : 'border-gray-100 hover:border-gray-200'
+                  )}
+                >
+                  {/* Hospital Card */}
+                  <div className="p-3">
+                    <div className="flex gap-3">
+                      <img
+                        src={hospital.images[0]}
+                        alt={hospital.name}
+                        className="w-20 h-20 rounded-xl object-cover shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-1">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className="text-sm font-bold text-gray-900 truncate">{hospital.name}</span>
+                            </div>
+                            <StarRating rating={hospital.rating} reviewCount={hospital.reviewCount} />
+                          </div>
+                          {isSelected && (
+                            <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center shrink-0">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-1 mt-1">
+                          <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
+                          <span className="text-[11px] text-gray-500">{hospital.location.city}, {hospital.location.district}</span>
+                        </div>
+
+                        {/* Certifications */}
+                        <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                          {hospital.certifications.slice(0, 3).map(cert => (
+                            <span key={cert} className={cn(
+                              'text-[9px] font-bold px-1.5 py-0.5 rounded-full',
+                              cert === 'JCI' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-500'
+                            )}>
+                              {cert === 'JCI' && '🛡️ '}{cert}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Specialties */}
+                    <div className="flex flex-wrap gap-1 mt-2.5">
+                      {hospital.specialties.slice(0, 4).map(sp => (
+                        <span key={sp} className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">{sp}</span>
+                      ))}
+                      {hospital.specialties.length > 4 && (
+                        <span className="text-[10px] text-gray-400 px-1.5 py-0.5">+{hospital.specialties.length - 4}</span>
+                      )}
+                    </div>
+
+                    {/* Description Preview */}
+                    <p className="text-[11px] text-gray-400 mt-2 line-clamp-2 leading-relaxed">
+                      {hospital.description[lang] || hospital.description.en}
+                    </p>
+
+                    {/* Quick Stats */}
+                    <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-gray-50">
+                      <div className="flex items-center gap-1">
+                        <Users className="w-3 h-3 text-gray-400" />
+                        <span className="text-[10px] text-gray-500">
+                          {lang === 'ko' ? `의료진 ${hospital.doctorCount}명` : `${hospital.doctorCount} doctors`}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Award className="w-3 h-3 text-gray-400" />
+                        <span className="text-[10px] text-gray-500">
+                          {lang === 'ko' ? `${hospital.yearEstablished}년 설립` : `Est. ${hospital.yearEstablished}`}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                    <span className="text-[11px] text-gray-600">{hospital.rating}</span>
-                    <span className="text-[11px] text-gray-400">({hospital.reviewCount.toLocaleString()})</span>
+
+                  {/* Action Buttons */}
+                  <div className="flex border-t border-gray-100">
+                    <button
+                      onClick={() => setDetailHospital(hospital)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      {lang === 'ko' ? '자세히 보기' : 'View Details'}
+                    </button>
+                    <button
+                      onClick={() => setSelectedHospital(hospital.id)}
+                      className={cn(
+                        'flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors',
+                        isSelected
+                          ? 'bg-violet-500 text-white'
+                          : 'text-violet-600 hover:bg-violet-50'
+                      )}
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      {isSelected
+                        ? (lang === 'ko' ? '선택됨' : 'Selected')
+                        : (lang === 'ko' ? '선택하기' : 'Select')}
+                    </button>
                   </div>
-                  <span className="text-[10px] text-gray-400">
-                    {hospital.location.city}, {hospital.location.district}
-                  </span>
                 </div>
-                {selectedHospital === hospital.id && (
-                  <Check className="w-5 h-5 text-violet-500 shrink-0" />
-                )}
-              </button>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
       )}
+
+      {/* Hospital Detail Sheet */}
+      <DetailSheet isOpen={!!detailHospital} onClose={() => setDetailHospital(null)}>
+        {detailHospital && (
+          <HospitalDetail
+            hospital={detailHospital}
+            lang={lang}
+            isSelected={selectedHospital === detailHospital.id}
+            onSelect={() => { setSelectedHospital(detailHospital.id); setDetailHospital(null); }}
+          />
+        )}
+      </DetailSheet>
+    </div>
+  );
+}
+
+function HospitalDetail({ hospital, lang, isSelected, onSelect }) {
+  return (
+    <div>
+      <ImageGallery images={hospital.images} alt={hospital.name} />
+
+      <div className="flex items-start justify-between mb-1">
+        <h3 className="text-lg font-bold text-gray-900">{hospital.name}</h3>
+        <StarRating rating={hospital.rating} reviewCount={hospital.reviewCount} size="md" />
+      </div>
+
+      <div className="flex items-center gap-1 mb-3">
+        <MapPin className="w-3.5 h-3.5 text-gray-400" />
+        <span className="text-xs text-gray-500">{hospital.location.address}</span>
+      </div>
+
+      {/* Certifications */}
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {hospital.certifications.map(cert => (
+          <span key={cert} className={cn(
+            'text-[11px] font-bold px-2 py-1 rounded-lg',
+            cert === 'JCI' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-600'
+          )}>
+            {cert === 'JCI' ? '🛡️ ' : '✓ '}{cert}
+          </span>
+        ))}
+      </div>
+
+      {/* Description */}
+      <p className="text-sm text-gray-600 leading-relaxed mb-4">
+        {hospital.description[lang] || hospital.description.en}
+      </p>
+
+      {/* Info Grid */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="bg-gray-50 rounded-xl p-3 text-center">
+          <Users className="w-5 h-5 text-violet-500 mx-auto mb-1" />
+          <span className="text-sm font-bold text-gray-900 block">{hospital.doctorCount}</span>
+          <span className="text-[10px] text-gray-400">{lang === 'ko' ? '의료진' : 'Doctors'}</span>
+        </div>
+        <div className="bg-gray-50 rounded-xl p-3 text-center">
+          <Award className="w-5 h-5 text-amber-500 mx-auto mb-1" />
+          <span className="text-sm font-bold text-gray-900 block">{hospital.yearEstablished}</span>
+          <span className="text-[10px] text-gray-400">{lang === 'ko' ? '설립연도' : 'Established'}</span>
+        </div>
+      </div>
+
+      {/* Specialties */}
+      <div className="mb-5">
+        <h4 className="text-xs font-bold text-gray-700 mb-2">{lang === 'ko' ? '전문 분야' : 'Specialties'}</h4>
+        <div className="flex flex-wrap gap-1.5">
+          {hospital.specialties.map(sp => (
+            <span key={sp} className="text-[11px] text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full font-medium">{sp}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Select Button */}
+      <button
+        onClick={onSelect}
+        className={cn(
+          'w-full py-3 rounded-xl text-sm font-bold transition-all',
+          isSelected
+            ? 'bg-gray-100 text-gray-500'
+            : 'bg-violet-600 text-white hover:bg-violet-700 active:scale-[0.98]'
+        )}
+      >
+        {isSelected
+          ? (lang === 'ko' ? '✓ 이미 선택됨' : '✓ Already Selected')
+          : (lang === 'ko' ? '이 병원 선택하기' : 'Select This Hospital')}
+      </button>
     </div>
   );
 }
@@ -356,6 +595,7 @@ function TreatmentStep({ lang }) {
    ================================================ */
 function AccommodationStep({ lang }) {
   const { selectedAccommodation, setSelectedAccommodation } = useTripStore();
+  const [detailAcc, setDetailAcc] = useState(null);
 
   const typeLabels = {
     luxury: { en: 'Luxury Hotel', ko: '럭셔리 호텔', emoji: '🌟' },
@@ -364,9 +604,17 @@ function AccommodationStep({ lang }) {
     guesthouse: { en: 'Recovery Stay', ko: '회복 전문 숙소', emoji: '🩹' },
   };
 
+  const amenityIcons = {
+    Pool: '🏊', Spa: '💆', Fitness: '💪', Concierge: '🛎️',
+    'Airport Shuttle': '✈️', Kitchen: '🍳', Laundry: '👔',
+    'Wi-Fi': '📶', 'Duty Free': '🛍️', Breakfast: '🥐',
+    'City View': '🌇', 'Medical Support': '⚕️', 'Nurse Call': '🔔',
+    'Ocean View': '🌊', 'Beach Access': '🏖️',
+  };
+
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-xl">
+      <div className="flex items-center gap-2 px-3 py-2.5 bg-blue-50 rounded-xl">
         <BedDouble className="w-4 h-4 text-blue-500 shrink-0" />
         <p className="text-xs text-blue-700">
           {lang === 'ko'
@@ -375,55 +623,189 @@ function AccommodationStep({ lang }) {
         </p>
       </div>
 
-      <div className="space-y-2">
-        {accommodations.map(acc => (
-          <button
-            key={acc.id}
-            onClick={() => setSelectedAccommodation(acc.id)}
-            className={cn(
-              'w-full flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-all',
-              selectedAccommodation === acc.id
-                ? 'border-violet-400 bg-violet-50'
-                : 'border-gray-100 bg-white hover:border-gray-200'
-            )}
-          >
-            <img
-              src={acc.image}
-              alt={acc.name[lang] || acc.name.en}
-              className="w-20 h-16 rounded-lg object-cover shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 rounded-full">
-                  {typeLabels[acc.type]?.emoji} {typeLabels[acc.type]?.[lang] || acc.type}
-                </span>
-              </div>
-              <span className="text-sm font-bold text-gray-900 block truncate">
-                {acc.name[lang] || acc.name.en}
-              </span>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="flex items-center gap-0.5">
-                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                  <span className="text-[11px] text-gray-600">{acc.rating}</span>
+      <div className="space-y-3">
+        {accommodations.map(acc => {
+          const isSelected = selectedAccommodation === acc.id;
+          const typeInfo = typeLabels[acc.type];
+          return (
+            <div
+              key={acc.id}
+              className={cn(
+                'rounded-2xl border-2 bg-white overflow-hidden transition-all',
+                isSelected ? 'border-violet-400 shadow-sm shadow-violet-100' : 'border-gray-100 hover:border-gray-200'
+              )}
+            >
+              <div className="p-3">
+                <div className="flex gap-3">
+                  <div className="relative shrink-0">
+                    <img
+                      src={acc.image}
+                      alt={acc.name[lang] || acc.name.en}
+                      className="w-24 h-20 rounded-xl object-cover"
+                    />
+                    <span className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 bg-white/90 rounded-full">
+                      {typeInfo?.emoji} {typeInfo?.[lang] || acc.type}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1">
+                      <span className="text-sm font-bold text-gray-900 truncate block">
+                        {acc.name[lang] || acc.name.en}
+                      </span>
+                      {isSelected && (
+                        <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center shrink-0">
+                          <Check className="w-3.5 h-3.5 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <StarRating rating={acc.rating} reviewCount={acc.reviewCount} />
+
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <div className="flex items-center gap-0.5">
+                        <MapPinned className="w-3 h-3 text-blue-400" />
+                        <span className="text-[11px] text-blue-500 font-medium">
+                          {lang === 'ko' ? `병원 ${acc.distanceToHospital}` : `${acc.distanceToHospital} to hospital`}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-gray-300">|</span>
+                      <span className="text-[11px] text-gray-400">
+                        {acc.location.city}, {acc.location.district}
+                      </span>
+                    </div>
+
+                    <span className="text-sm font-bold text-violet-600 mt-1.5 block">
+                      ₩{acc.pricePerNight.KRW.toLocaleString()}<span className="text-[10px] text-gray-400 font-normal">/{lang === 'ko' ? '박' : 'night'}</span>
+                    </span>
+                  </div>
                 </div>
-                <span className="text-[11px] text-gray-400">|</span>
-                <div className="flex items-center gap-0.5">
-                  <MapPinned className="w-3 h-3 text-gray-400" />
-                  <span className="text-[11px] text-gray-400">
-                    {lang === 'ko' ? `병원 ${acc.distanceToHospital}` : `${acc.distanceToHospital} to hospital`}
-                  </span>
+
+                {/* Amenities */}
+                <div className="flex flex-wrap gap-1.5 mt-2.5 pt-2.5 border-t border-gray-50">
+                  {acc.amenities.map(am => (
+                    <span key={am} className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
+                      {amenityIcons[am] || '•'} {am}
+                    </span>
+                  ))}
                 </div>
+
+                {/* Description */}
+                <p className="text-[11px] text-gray-400 mt-2 line-clamp-1">
+                  {acc.description[lang] || acc.description.en}
+                </p>
               </div>
-              <span className="text-xs font-bold text-violet-600 mt-1 block">
-                ₩{acc.pricePerNight.KRW.toLocaleString()}/{lang === 'ko' ? '박' : 'night'}
-              </span>
+
+              {/* Action Buttons */}
+              <div className="flex border-t border-gray-100">
+                <button
+                  onClick={() => setDetailAcc(acc)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  {lang === 'ko' ? '자세히 보기' : 'View Details'}
+                </button>
+                <button
+                  onClick={() => setSelectedAccommodation(acc.id)}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors',
+                    isSelected
+                      ? 'bg-violet-500 text-white'
+                      : 'text-violet-600 hover:bg-violet-50'
+                  )}
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  {isSelected
+                    ? (lang === 'ko' ? '선택됨' : 'Selected')
+                    : (lang === 'ko' ? '선택하기' : 'Select')}
+                </button>
+              </div>
             </div>
-            {selectedAccommodation === acc.id && (
-              <Check className="w-5 h-5 text-violet-500 shrink-0 mt-2" />
-            )}
-          </button>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Accommodation Detail Sheet */}
+      <DetailSheet isOpen={!!detailAcc} onClose={() => setDetailAcc(null)}>
+        {detailAcc && (
+          <AccommodationDetail
+            acc={detailAcc}
+            lang={lang}
+            typeLabels={typeLabels}
+            amenityIcons={amenityIcons}
+            isSelected={selectedAccommodation === detailAcc.id}
+            onSelect={() => { setSelectedAccommodation(detailAcc.id); setDetailAcc(null); }}
+          />
+        )}
+      </DetailSheet>
+    </div>
+  );
+}
+
+function AccommodationDetail({ acc, lang, typeLabels, amenityIcons, isSelected, onSelect }) {
+  const typeInfo = typeLabels[acc.type];
+  return (
+    <div>
+      <div className="relative rounded-2xl overflow-hidden mb-4">
+        <img src={acc.image} alt={acc.name[lang] || acc.name.en} className="w-full h-48 sm:h-56 object-cover" />
+        <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 bg-white/90 rounded-full">
+          {typeInfo?.emoji} {typeInfo?.[lang] || acc.type}
+        </span>
+      </div>
+
+      <div className="flex items-start justify-between mb-1">
+        <h3 className="text-lg font-bold text-gray-900">{acc.name[lang] || acc.name.en}</h3>
+        <span className="text-lg font-bold text-violet-600 shrink-0">
+          ₩{acc.pricePerNight.KRW.toLocaleString()}
+          <span className="text-xs text-gray-400 font-normal">/{lang === 'ko' ? '박' : 'night'}</span>
+        </span>
+      </div>
+
+      <div className="flex items-center gap-3 mb-3">
+        <StarRating rating={acc.rating} reviewCount={acc.reviewCount} size="md" />
+        <span className="text-xs text-gray-300">|</span>
+        <div className="flex items-center gap-1">
+          <MapPinned className="w-3.5 h-3.5 text-blue-400" />
+          <span className="text-xs text-blue-500 font-medium">
+            {lang === 'ko' ? `병원까지 ${acc.distanceToHospital}` : `${acc.distanceToHospital} to hospital`}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 mb-4">
+        <MapPin className="w-3.5 h-3.5 text-gray-400" />
+        <span className="text-xs text-gray-500">{acc.location.city}, {acc.location.district}</span>
+      </div>
+
+      {/* Description */}
+      <p className="text-sm text-gray-600 leading-relaxed mb-4">
+        {acc.description[lang] || acc.description.en}
+      </p>
+
+      {/* Amenities */}
+      <div className="mb-5">
+        <h4 className="text-xs font-bold text-gray-700 mb-2">{lang === 'ko' ? '편의시설' : 'Amenities'}</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {acc.amenities.map(am => (
+            <div key={am} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+              <span className="text-sm">{amenityIcons[am] || '•'}</span>
+              <span className="text-xs text-gray-600">{am}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={onSelect}
+        className={cn(
+          'w-full py-3 rounded-xl text-sm font-bold transition-all',
+          isSelected
+            ? 'bg-gray-100 text-gray-500'
+            : 'bg-violet-600 text-white hover:bg-violet-700 active:scale-[0.98]'
+        )}
+      >
+        {isSelected
+          ? (lang === 'ko' ? '✓ 이미 선택됨' : '✓ Already Selected')
+          : (lang === 'ko' ? '이 숙소 선택하기' : 'Select This Stay')}
+      </button>
     </div>
   );
 }
@@ -433,74 +815,189 @@ function AccommodationStep({ lang }) {
    ================================================ */
 function DiningStep({ lang }) {
   const { selectedRestaurants, toggleRestaurant } = useTripStore();
+  const [detailRest, setDetailRest] = useState(null);
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 rounded-xl">
+      <div className="flex items-center gap-2 px-3 py-2.5 bg-orange-50 rounded-xl">
         <UtensilsCrossed className="w-4 h-4 text-orange-500 shrink-0" />
         <p className="text-xs text-orange-700">
           {lang === 'ko'
-            ? '가고 싶은 맛집을 자유롭게 선택해주세요 (선택사항)'
-            : 'Pick restaurants you want to visit (optional)'}
+            ? '가고 싶은 맛집을 자유롭게 선택해주세요 (선택사항, 복수 선택 가능)'
+            : 'Pick restaurants you want to visit (optional, multi-select)'}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {selectedRestaurants.length > 0 && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-orange-500 text-white rounded-xl">
+          <Check className="w-4 h-4" />
+          <span className="text-xs font-bold">{selectedRestaurants.length}{lang === 'ko' ? '곳 선택됨' : ' selected'}</span>
+        </div>
+      )}
+
+      <div className="space-y-3">
         {restaurants.map(rest => {
-          const selected = selectedRestaurants.includes(rest.id);
+          const isSelected = selectedRestaurants.includes(rest.id);
           return (
-            <button
+            <div
               key={rest.id}
-              onClick={() => toggleRestaurant(rest.id)}
               className={cn(
-                'flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-all',
-                selected
-                  ? 'border-orange-300 bg-orange-50'
-                  : 'border-gray-100 bg-white hover:border-gray-200'
+                'rounded-2xl border-2 bg-white overflow-hidden transition-all',
+                isSelected ? 'border-orange-300 shadow-sm shadow-orange-50' : 'border-gray-100 hover:border-gray-200'
               )}
             >
-              <img
-                src={rest.image}
-                alt={rest.name[lang] || rest.name.en}
-                className="w-16 h-16 rounded-lg object-cover shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <span className="text-sm font-bold text-gray-900 block truncate">
-                  {rest.name[lang] || rest.name.en}
-                </span>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[10px] px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded-full font-medium">
-                    {rest.highlight}
-                  </span>
-                  <span className="text-[10px] text-gray-400">{rest.priceRange}</span>
-                </div>
-                <p className="text-[11px] text-gray-500 mt-1 line-clamp-1">
-                  {rest.description[lang] || rest.description.en}
-                </p>
-                <div className="flex gap-1 mt-1.5">
-                  {rest.tags.slice(0, 2).map(tag => (
-                    <span key={tag} className="text-[9px] text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded-full">{tag}</span>
-                  ))}
+              <div className="p-3">
+                <div className="flex gap-3">
+                  <div className="relative shrink-0">
+                    <img
+                      src={rest.image}
+                      alt={rest.name[lang] || rest.name.en}
+                      className="w-20 h-20 rounded-xl object-cover"
+                    />
+                    {isSelected && (
+                      <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-sm font-bold text-gray-900 truncate">{rest.name[lang] || rest.name.en}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded-full">
+                        {rest.highlight}
+                      </span>
+                      <span className="text-[11px] text-gray-400">{rest.priceRange}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <StarRating rating={rest.rating} />
+                      <span className="text-[11px] text-gray-300">|</span>
+                      <span className="text-[11px] text-gray-400">{rest.cuisine}</span>
+                    </div>
+
+                    <p className="text-[11px] text-gray-400 line-clamp-2 leading-relaxed">
+                      {rest.description[lang] || rest.description.en}
+                    </p>
+
+                    <div className="flex gap-1 mt-1.5">
+                      {rest.tags.map(tag => (
+                        <span key={tag} className="text-[9px] text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded-full">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className={cn(
-                'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-2 transition-colors',
-                selected ? 'bg-orange-500 border-orange-500' : 'border-gray-300'
-              )}>
-                {selected && <Check className="w-3 h-3 text-white" />}
+
+              {/* Action Buttons */}
+              <div className="flex border-t border-gray-100">
+                <button
+                  onClick={() => setDetailRest(rest)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  {lang === 'ko' ? '자세히 보기' : 'View Details'}
+                </button>
+                <button
+                  onClick={() => toggleRestaurant(rest.id)}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors',
+                    isSelected
+                      ? 'bg-orange-500 text-white'
+                      : 'text-orange-600 hover:bg-orange-50'
+                  )}
+                >
+                  {isSelected ? (
+                    <><Check className="w-3.5 h-3.5" />{lang === 'ko' ? '선택 해제' : 'Deselect'}</>
+                  ) : (
+                    <><Heart className="w-3.5 h-3.5" />{lang === 'ko' ? '선택하기' : 'Select'}</>
+                  )}
+                </button>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
 
-      {selectedRestaurants.length > 0 && (
-        <div className="text-center">
-          <span className="text-xs text-gray-500">
-            {selectedRestaurants.length}{lang === 'ko' ? '곳 선택됨' : ' selected'}
-          </span>
+      {/* Restaurant Detail Sheet */}
+      <DetailSheet isOpen={!!detailRest} onClose={() => setDetailRest(null)}>
+        {detailRest && (
+          <RestaurantDetail
+            rest={detailRest}
+            lang={lang}
+            isSelected={selectedRestaurants.includes(detailRest.id)}
+            onToggle={() => { toggleRestaurant(detailRest.id); }}
+          />
+        )}
+      </DetailSheet>
+    </div>
+  );
+}
+
+function RestaurantDetail({ rest, lang, isSelected, onToggle }) {
+  return (
+    <div>
+      <div className="relative rounded-2xl overflow-hidden mb-4">
+        <img src={rest.image} alt={rest.name[lang] || rest.name.en} className="w-full h-48 sm:h-56 object-cover" />
+        <span className="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full">
+          {rest.highlight}
+        </span>
+      </div>
+
+      <div className="flex items-start justify-between mb-1">
+        <h3 className="text-lg font-bold text-gray-900">{rest.name[lang] || rest.name.en}</h3>
+        <span className="text-sm font-bold text-gray-500">{rest.priceRange}</span>
+      </div>
+
+      <div className="flex items-center gap-2 mb-3">
+        <StarRating rating={rest.rating} size="md" />
+        <span className="text-xs text-gray-300">|</span>
+        <span className="text-xs text-gray-500">{rest.cuisine}</span>
+        <span className="text-xs text-gray-300">|</span>
+        <span className="text-xs text-gray-500">{rest.location.city}, {rest.location.district}</span>
+      </div>
+
+      <p className="text-sm text-gray-600 leading-relaxed mb-4">
+        {rest.description[lang] || rest.description.en}
+      </p>
+
+      {/* Tags */}
+      <div className="mb-5">
+        <h4 className="text-xs font-bold text-gray-700 mb-2">{lang === 'ko' ? '특징' : 'Features'}</h4>
+        <div className="flex flex-wrap gap-1.5">
+          {rest.tags.map(tag => (
+            <span key={tag} className="text-[11px] text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full font-medium">{tag}</span>
+          ))}
         </div>
-      )}
+      </div>
+
+      {/* Info */}
+      <div className="grid grid-cols-2 gap-2 mb-5">
+        <div className="bg-gray-50 rounded-xl p-3">
+          <span className="text-[10px] text-gray-400 block mb-0.5">{lang === 'ko' ? '요리 종류' : 'Cuisine'}</span>
+          <span className="text-xs font-bold text-gray-700">{rest.cuisine}</span>
+        </div>
+        <div className="bg-gray-50 rounded-xl p-3">
+          <span className="text-[10px] text-gray-400 block mb-0.5">{lang === 'ko' ? '가격대' : 'Price Range'}</span>
+          <span className="text-xs font-bold text-gray-700">{rest.priceRange}</span>
+        </div>
+      </div>
+
+      <button
+        onClick={onToggle}
+        className={cn(
+          'w-full py-3 rounded-xl text-sm font-bold transition-all',
+          isSelected
+            ? 'bg-orange-100 text-orange-600'
+            : 'bg-orange-500 text-white hover:bg-orange-600 active:scale-[0.98]'
+        )}
+      >
+        {isSelected
+          ? (lang === 'ko' ? '선택 해제하기' : 'Deselect')
+          : (lang === 'ko' ? '이 맛집 선택하기' : 'Select This Restaurant')}
+      </button>
     </div>
   );
 }
@@ -510,81 +1007,215 @@ function DiningStep({ lang }) {
    ================================================ */
 function AttractionsStep({ lang }) {
   const { selectedAttractions, toggleAttraction } = useTripStore();
+  const [detailAttr, setDetailAttr] = useState(null);
 
   const typeColors = {
-    Cultural: 'bg-amber-50 text-amber-700',
-    Shopping: 'bg-pink-50 text-pink-700',
-    Landmark: 'bg-blue-50 text-blue-700',
-    Entertainment: 'bg-purple-50 text-purple-700',
-    Nature: 'bg-green-50 text-green-700',
-    Wellness: 'bg-teal-50 text-teal-700',
+    Cultural: { bg: 'bg-amber-50', text: 'text-amber-700', icon: '🏛️' },
+    Shopping: { bg: 'bg-pink-50', text: 'text-pink-700', icon: '🛍️' },
+    Landmark: { bg: 'bg-blue-50', text: 'text-blue-700', icon: '🗼' },
+    Entertainment: { bg: 'bg-purple-50', text: 'text-purple-700', icon: '🎭' },
+    Nature: { bg: 'bg-green-50', text: 'text-green-700', icon: '🌿' },
+    Wellness: { bg: 'bg-teal-50', text: 'text-teal-700', icon: '♨️' },
   };
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded-xl">
+      <div className="flex items-center gap-2 px-3 py-2.5 bg-emerald-50 rounded-xl">
         <MapPin className="w-4 h-4 text-emerald-500 shrink-0" />
         <p className="text-xs text-emerald-700">
           {lang === 'ko'
-            ? '치료 전후로 즐길 관광지를 골라보세요 (선택사항)'
-            : 'Pick attractions to enjoy before/after treatment (optional)'}
+            ? '치료 전후로 즐길 관광지를 골라보세요 (선택사항, 복수 선택 가능)'
+            : 'Pick attractions to enjoy before/after treatment (optional, multi-select)'}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      {selectedAttractions.length > 0 && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500 text-white rounded-xl">
+          <Check className="w-4 h-4" />
+          <span className="text-xs font-bold">{selectedAttractions.length}{lang === 'ko' ? '곳 선택됨' : ' selected'}</span>
+        </div>
+      )}
+
+      <div className="space-y-3">
         {attractions.map(attr => {
-          const selected = selectedAttractions.includes(attr.id);
+          const isSelected = selectedAttractions.includes(attr.id);
+          const tc = typeColors[attr.type] || { bg: 'bg-gray-50', text: 'text-gray-600', icon: '📍' };
           return (
-            <button
+            <div
               key={attr.id}
-              onClick={() => toggleAttraction(attr.id)}
               className={cn(
-                'flex flex-col p-0 rounded-xl border-2 text-left transition-all overflow-hidden',
-                selected
-                  ? 'border-emerald-300 bg-emerald-50/50'
-                  : 'border-gray-100 bg-white hover:border-gray-200'
+                'rounded-2xl border-2 bg-white overflow-hidden transition-all',
+                isSelected ? 'border-emerald-300 shadow-sm shadow-emerald-50' : 'border-gray-100 hover:border-gray-200'
               )}
             >
               <div className="relative">
                 <img
                   src={attr.image}
                   alt={attr.name[lang] || attr.name.en}
-                  className="w-full h-24 object-cover"
+                  className="w-full h-36 sm:h-44 object-cover"
                 />
-                <span className={cn(
-                  'absolute top-2 left-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full',
-                  typeColors[attr.type] || 'bg-gray-100 text-gray-600'
-                )}>
-                  {attr.type}
-                </span>
-                {selected && (
-                  <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
-                    <Check className="w-3 h-3 text-white" />
+                <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                  <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-full', tc.bg, tc.text)}>
+                    {tc.icon} {attr.type}
+                  </span>
+                </div>
+                {isSelected && (
+                  <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                    <Check className="w-3.5 h-3.5 text-white" />
                   </div>
                 )}
-              </div>
-              <div className="p-2.5">
-                <span className="text-xs font-bold text-gray-900 block truncate">
-                  {attr.name[lang] || attr.name.en}
-                </span>
-                <div className="flex items-center gap-1 mt-1">
-                  <Clock className="w-3 h-3 text-gray-400" />
-                  <span className="text-[10px] text-gray-400">{attr.duration}</span>
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute bottom-2.5 left-3 right-3 flex items-end justify-between">
+                  <div>
+                    <span className="text-white text-sm font-bold block drop-shadow-sm">
+                      {attr.name[lang] || attr.name.en}
+                    </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <div className="flex items-center gap-0.5">
+                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <span className="text-[11px] text-white/90 font-medium">{attr.rating}</span>
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        <Clock className="w-3 h-3 text-white/70" />
+                        <span className="text-[11px] text-white/80">{attr.duration}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <span className="text-[10px] text-gray-500 block mt-0.5 truncate">{attr.highlight}</span>
               </div>
-            </button>
+
+              <div className="p-3">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    {attr.highlight}
+                  </span>
+                  <span className="text-[11px] text-gray-400">
+                    {attr.location.city}, {attr.location.district}
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
+                  {attr.description[lang] || attr.description.en}
+                </p>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {attr.tags.map(tag => (
+                    <span key={tag} className="text-[9px] text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded-full">{tag}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex border-t border-gray-100">
+                <button
+                  onClick={() => setDetailAttr(attr)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-100"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  {lang === 'ko' ? '자세히 보기' : 'View Details'}
+                </button>
+                <button
+                  onClick={() => toggleAttraction(attr.id)}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors',
+                    isSelected
+                      ? 'bg-emerald-500 text-white'
+                      : 'text-emerald-600 hover:bg-emerald-50'
+                  )}
+                >
+                  {isSelected ? (
+                    <><Check className="w-3.5 h-3.5" />{lang === 'ko' ? '선택 해제' : 'Deselect'}</>
+                  ) : (
+                    <><MapPin className="w-3.5 h-3.5" />{lang === 'ko' ? '선택하기' : 'Select'}</>
+                  )}
+                </button>
+              </div>
+            </div>
           );
         })}
       </div>
 
-      {selectedAttractions.length > 0 && (
-        <div className="text-center">
-          <span className="text-xs text-gray-500">
-            {selectedAttractions.length}{lang === 'ko' ? '곳 선택됨' : ' selected'}
-          </span>
+      {/* Attraction Detail Sheet */}
+      <DetailSheet isOpen={!!detailAttr} onClose={() => setDetailAttr(null)}>
+        {detailAttr && (
+          <AttractionDetail
+            attr={detailAttr}
+            lang={lang}
+            typeColors={typeColors}
+            isSelected={selectedAttractions.includes(detailAttr.id)}
+            onToggle={() => { toggleAttraction(detailAttr.id); }}
+          />
+        )}
+      </DetailSheet>
+    </div>
+  );
+}
+
+function AttractionDetail({ attr, lang, typeColors, isSelected, onToggle }) {
+  const tc = typeColors[attr.type] || { bg: 'bg-gray-50', text: 'text-gray-600', icon: '📍' };
+  return (
+    <div>
+      <div className="relative rounded-2xl overflow-hidden mb-4">
+        <img src={attr.image} alt={attr.name[lang] || attr.name.en} className="w-full h-48 sm:h-56 object-cover" />
+        <span className={cn('absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded-full', tc.bg, tc.text)}>
+          {tc.icon} {attr.type}
+        </span>
+      </div>
+
+      <h3 className="text-lg font-bold text-gray-900 mb-1">{attr.name[lang] || attr.name.en}</h3>
+
+      <div className="flex items-center gap-2 mb-3">
+        <StarRating rating={attr.rating} size="md" />
+        <span className="text-xs text-gray-300">|</span>
+        <div className="flex items-center gap-1">
+          <Clock className="w-3.5 h-3.5 text-gray-400" />
+          <span className="text-xs text-gray-500">{attr.duration}</span>
         </div>
-      )}
+        <span className="text-xs text-gray-300">|</span>
+        <span className="text-xs text-gray-500">{attr.location.city}, {attr.location.district}</span>
+      </div>
+
+      <div className="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full mb-3">
+        {attr.highlight}
+      </div>
+
+      <p className="text-sm text-gray-600 leading-relaxed mb-4">
+        {attr.description[lang] || attr.description.en}
+      </p>
+
+      {/* Tags */}
+      <div className="mb-5">
+        <h4 className="text-xs font-bold text-gray-700 mb-2">{lang === 'ko' ? '태그' : 'Tags'}</h4>
+        <div className="flex flex-wrap gap-1.5">
+          {attr.tags.map(tag => (
+            <span key={tag} className="text-[11px] text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full font-medium">{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="grid grid-cols-2 gap-2 mb-5">
+        <div className="bg-gray-50 rounded-xl p-3">
+          <span className="text-[10px] text-gray-400 block mb-0.5">{lang === 'ko' ? '소요 시간' : 'Duration'}</span>
+          <span className="text-xs font-bold text-gray-700">{attr.duration}</span>
+        </div>
+        <div className="bg-gray-50 rounded-xl p-3">
+          <span className="text-[10px] text-gray-400 block mb-0.5">{lang === 'ko' ? '유형' : 'Type'}</span>
+          <span className="text-xs font-bold text-gray-700">{tc.icon} {attr.type}</span>
+        </div>
+      </div>
+
+      <button
+        onClick={onToggle}
+        className={cn(
+          'w-full py-3 rounded-xl text-sm font-bold transition-all',
+          isSelected
+            ? 'bg-emerald-100 text-emerald-600'
+            : 'bg-emerald-500 text-white hover:bg-emerald-600 active:scale-[0.98]'
+        )}
+      >
+        {isSelected
+          ? (lang === 'ko' ? '선택 해제하기' : 'Deselect')
+          : (lang === 'ko' ? '이 관광지 선택하기' : 'Select This Attraction')}
+      </button>
     </div>
   );
 }
@@ -610,21 +1241,11 @@ function ContactStep({ lang }) {
           </span>
         </div>
         <div className="space-y-2">
-          {hospital && (
-            <SummaryRow emoji="🏥" label={lang === 'ko' ? '병원' : 'Hospital'} value={hospital.name} />
-          )}
-          {selectedCategory && (
-            <SummaryRow emoji={getCategoryEmoji(selectedCategory)} label={lang === 'ko' ? '시술' : 'Treatment'} value={selectedCategory} />
-          )}
-          {acc && (
-            <SummaryRow emoji="🏨" label={lang === 'ko' ? '숙소' : 'Stay'} value={acc.name[lang] || acc.name.en} />
-          )}
-          {selectedRestaurants.length > 0 && (
-            <SummaryRow emoji="🍽️" label={lang === 'ko' ? '맛집' : 'Dining'} value={`${selectedRestaurants.length}${lang === 'ko' ? '곳' : ' places'}`} />
-          )}
-          {selectedAttractions.length > 0 && (
-            <SummaryRow emoji="🗺️" label={lang === 'ko' ? '관광' : 'Tour'} value={`${selectedAttractions.length}${lang === 'ko' ? '곳' : ' places'}`} />
-          )}
+          {hospital && <SummaryRow emoji="🏥" label={lang === 'ko' ? '병원' : 'Hospital'} value={hospital.name} />}
+          {selectedCategory && <SummaryRow emoji={getCategoryEmoji(selectedCategory)} label={lang === 'ko' ? '시술' : 'Treatment'} value={selectedCategory} />}
+          {acc && <SummaryRow emoji="🏨" label={lang === 'ko' ? '숙소' : 'Stay'} value={acc.name[lang] || acc.name.en} />}
+          {selectedRestaurants.length > 0 && <SummaryRow emoji="🍽️" label={lang === 'ko' ? '맛집' : 'Dining'} value={`${selectedRestaurants.length}${lang === 'ko' ? '곳' : ' places'}`} />}
+          {selectedAttractions.length > 0 && <SummaryRow emoji="🗺️" label={lang === 'ko' ? '관광' : 'Tour'} value={`${selectedAttractions.length}${lang === 'ko' ? '곳' : ' places'}`} />}
         </div>
       </div>
 
@@ -634,46 +1255,11 @@ function ContactStep({ lang }) {
           {lang === 'ko' ? '상담 신청 정보' : 'Contact Information'}
         </h3>
         <div className="space-y-3">
-          <FormField
-            icon={User}
-            label={lang === 'ko' ? '이름' : 'Name'}
-            value={contactInfo.name}
-            onChange={v => setContactInfo({ name: v })}
-            placeholder={lang === 'ko' ? '이름을 입력해주세요' : 'Enter your name'}
-            required
-          />
-          <FormField
-            icon={Mail}
-            label={lang === 'ko' ? '이메일' : 'Email'}
-            type="email"
-            value={contactInfo.email}
-            onChange={v => setContactInfo({ email: v })}
-            placeholder={lang === 'ko' ? '이메일을 입력해주세요' : 'Enter your email'}
-            required
-          />
-          <FormField
-            icon={Phone}
-            label={lang === 'ko' ? '전화번호' : 'Phone'}
-            type="tel"
-            value={contactInfo.phone}
-            onChange={v => setContactInfo({ phone: v })}
-            placeholder={lang === 'ko' ? '전화번호를 입력해주세요' : 'Enter your phone'}
-            required
-          />
-          <FormField
-            icon={Globe}
-            label={lang === 'ko' ? '국가' : 'Country'}
-            value={contactInfo.country}
-            onChange={v => setContactInfo({ country: v })}
-            placeholder={lang === 'ko' ? '국가를 입력해주세요' : 'Enter your country'}
-          />
-          <FormField
-            icon={Calendar}
-            label={lang === 'ko' ? '희망 방문일' : 'Preferred Date'}
-            type="date"
-            value={contactInfo.preferredDate}
-            onChange={v => setContactInfo({ preferredDate: v })}
-          />
+          <FormField icon={User} label={lang === 'ko' ? '이름' : 'Name'} value={contactInfo.name} onChange={v => setContactInfo({ name: v })} placeholder={lang === 'ko' ? '이름을 입력해주세요' : 'Enter your name'} required />
+          <FormField icon={Mail} label={lang === 'ko' ? '이메일' : 'Email'} type="email" value={contactInfo.email} onChange={v => setContactInfo({ email: v })} placeholder={lang === 'ko' ? '이메일을 입력해주세요' : 'Enter your email'} required />
+          <FormField icon={Phone} label={lang === 'ko' ? '전화번호' : 'Phone'} type="tel" value={contactInfo.phone} onChange={v => setContactInfo({ phone: v })} placeholder={lang === 'ko' ? '전화번호를 입력해주세요' : 'Enter your phone'} required />
+          <FormField icon={Globe} label={lang === 'ko' ? '국가' : 'Country'} value={contactInfo.country} onChange={v => setContactInfo({ country: v })} placeholder={lang === 'ko' ? '국가를 입력해주세요' : 'Enter your country'} />
+          <FormField icon={Calendar} label={lang === 'ko' ? '희망 방문일' : 'Preferred Date'} type="date" value={contactInfo.preferredDate} onChange={v => setContactInfo({ preferredDate: v })} />
           <div>
             <label className="flex items-center gap-1.5 text-xs font-medium text-gray-700 mb-1.5">
               <MessageSquare className="w-3.5 h-3.5" />
@@ -690,7 +1276,6 @@ function ContactStep({ lang }) {
         </div>
       </div>
 
-      {/* Trust Banner */}
       <div className="flex items-center gap-3 p-3 bg-violet-50 rounded-xl">
         <Shield className="w-5 h-5 text-violet-500 shrink-0" />
         <div>
@@ -742,49 +1327,27 @@ function SuccessScreen({ lang, onReset }) {
         </p>
 
         <div className="space-y-2">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 text-left"
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 text-left">
             <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
               <Phone className="w-5 h-5 text-violet-600" />
             </div>
             <div>
-              <span className="text-xs font-bold text-gray-900">
-                {lang === 'ko' ? '전화 상담' : 'Phone Consultation'}
-              </span>
-              <span className="text-[11px] text-gray-400 block">
-                {lang === 'ko' ? '24시간 이내 연락' : 'Within 24 hours'}
-              </span>
+              <span className="text-xs font-bold text-gray-900">{lang === 'ko' ? '전화 상담' : 'Phone Consultation'}</span>
+              <span className="text-[11px] text-gray-400 block">{lang === 'ko' ? '24시간 이내 연락' : 'Within 24 hours'}</span>
             </div>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 text-left"
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 text-left">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
               <Mail className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <span className="text-xs font-bold text-gray-900">
-                {lang === 'ko' ? '맞춤 플랜 이메일' : 'Custom Plan Email'}
-              </span>
-              <span className="text-[11px] text-gray-400 block">
-                {lang === 'ko' ? '상세 일정 & 견적서' : 'Detailed itinerary & quote'}
-              </span>
+              <span className="text-xs font-bold text-gray-900">{lang === 'ko' ? '맞춤 플랜 이메일' : 'Custom Plan Email'}</span>
+              <span className="text-[11px] text-gray-400 block">{lang === 'ko' ? '상세 일정 & 견적서' : 'Detailed itinerary & quote'}</span>
             </div>
           </motion.div>
         </div>
 
-        <button
-          onClick={onReset}
-          className="mt-8 flex items-center justify-center gap-2 w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors"
-        >
+        <button onClick={onReset} className="mt-8 flex items-center justify-center gap-2 w-full py-3 bg-gray-900 text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors">
           <RotateCcw className="w-4 h-4" />
           {lang === 'ko' ? '홈으로 돌아가기' : 'Back to Home'}
         </button>
@@ -827,14 +1390,8 @@ function FormField({ icon: Icon, label, type = 'text', value, onChange, placehol
 
 function getCategoryEmoji(id) {
   const map = {
-    beauty: '💄',
-    eye: '👁️',
-    dental: '🦷',
-    plastic: '✨',
-    checkup: '🩺',
-    stemcell: '🧬',
-    wellness: '🌿',
-    vip: '👑',
+    beauty: '💄', eye: '👁️', dental: '🦷', plastic: '✨',
+    checkup: '🩺', stemcell: '🧬', wellness: '🌿', vip: '👑',
   };
   return map[id] || '🏥';
 }
