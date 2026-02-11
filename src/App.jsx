@@ -43,7 +43,7 @@ export default function App() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-white font-body text-gray-900">
+    <div className="min-h-screen bg-white font-body text-gray-900 overflow-x-hidden">
       <ScrollToTop />
       <Header />
       <main className="min-h-screen">

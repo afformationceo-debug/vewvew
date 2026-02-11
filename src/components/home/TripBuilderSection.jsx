@@ -93,8 +93,8 @@ export default function TripBuilderSection() {
           : 'Choose your style, AI creates your perfect plan'}
       </p>
 
-      {/* Trip Type Cards */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Trip Type Cards - Vertical stack on mobile, 3-col on desktop */}
+      <div className="flex flex-col gap-2.5 sm:grid sm:grid-cols-3 sm:gap-3">
         {tripCards.map((card, index) => (
           <motion.button
             key={card.id}
@@ -104,47 +104,48 @@ export default function TripBuilderSection() {
             transition={{ delay: index * 0.1, duration: 0.4 }}
             onClick={() => handleSelect(card.id)}
             className={cn(
-              'relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-200',
-              'hover:shadow-lg hover:-translate-y-1 active:scale-[0.98]',
+              'relative flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-200',
+              'sm:flex-col sm:items-center sm:p-4 sm:rounded-2xl',
+              'hover:shadow-lg active:scale-[0.98]',
               card.borderColor, card.bgLight,
               'group cursor-pointer'
             )}
           >
             {card.popular && (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-violet-600 text-white text-[10px] font-bold rounded-full whitespace-nowrap">
+              <span className="absolute -top-2 left-4 sm:left-1/2 sm:-translate-x-1/2 px-2 py-0.5 bg-violet-600 text-white text-[10px] font-bold rounded-full whitespace-nowrap">
                 BEST
               </span>
             )}
 
             {/* Icon Row */}
-            <div className="flex items-center gap-1 mb-3">
+            <div className="flex items-center gap-1 sm:mb-3 shrink-0">
               {card.items.map((item, i) => (
-                <span key={i} className="text-xl">{item.icon}</span>
+                <span key={i} className="text-lg sm:text-xl">{item.icon}</span>
               ))}
             </div>
 
-            {/* Title */}
-            <span className={cn('text-sm font-bold mb-1', card.textColor)}>
-              {titles[card.id][lang]}
-            </span>
-
-            {/* Description */}
-            <span className="text-[11px] text-gray-500 text-center leading-tight">
-              {descriptions[card.id][lang]}
-            </span>
-
-            {/* Item Labels */}
-            <div className="flex flex-wrap justify-center gap-1 mt-2.5">
-              {card.items.map((item, i) => (
-                <span key={i} className="text-[10px] text-gray-400 bg-white/80 px-1.5 py-0.5 rounded-full">
-                  {item.label[lang]}
-                </span>
-              ))}
+            {/* Text Content */}
+            <div className="flex-1 min-w-0 text-left sm:text-center">
+              <span className={cn('text-sm font-bold block sm:mb-1', card.textColor)}>
+                {titles[card.id][lang]}
+              </span>
+              <span className="text-[11px] text-gray-500 leading-tight block">
+                {descriptions[card.id][lang]}
+              </span>
+              {/* Item Labels - inline on mobile */}
+              <div className="flex flex-wrap gap-1 mt-1.5 sm:justify-center sm:mt-2.5">
+                {card.items.map((item, i) => (
+                  <span key={i} className="text-[10px] text-gray-400 bg-white/80 px-1.5 py-0.5 rounded-full">
+                    {item.label[lang]}
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* Arrow */}
             <div className={cn(
-              'mt-3 w-7 h-7 rounded-full flex items-center justify-center transition-colors',
+              'w-7 h-7 rounded-full flex items-center justify-center transition-colors shrink-0',
+              'sm:mt-3',
               'bg-white/80 group-hover:bg-white',
               card.textColor
             )}>

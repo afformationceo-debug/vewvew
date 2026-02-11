@@ -84,15 +84,16 @@ export default function ReviewsHighlight() {
         <span className="text-[11px] font-medium text-violet-700">avg 4.8</span>
       </div>
 
-      <div className="relative group/nav">
+      <div className="relative group/nav overflow-hidden">
         <button
           ref={prevRef}
           className={cn(
-            'absolute -left-3 top-1/2 -translate-y-1/2 z-10',
+            'absolute left-0 top-1/2 -translate-y-1/2 z-10',
             'w-8 h-8 rounded-full bg-white shadow-md border border-gray-100',
             'flex items-center justify-center',
             'text-gray-500 hover:text-primary-600',
             'opacity-0 group-hover/nav:opacity-100 transition-opacity',
+            'hidden md:flex',
           )}
           aria-label="Previous"
         >
@@ -102,11 +103,12 @@ export default function ReviewsHighlight() {
         <button
           ref={nextRef}
           className={cn(
-            'absolute -right-3 top-1/2 -translate-y-1/2 z-10',
+            'absolute right-0 top-1/2 -translate-y-1/2 z-10',
             'w-8 h-8 rounded-full bg-white shadow-md border border-gray-100',
             'flex items-center justify-center',
             'text-gray-500 hover:text-primary-600',
             'opacity-0 group-hover/nav:opacity-100 transition-opacity',
+            'hidden md:flex',
           )}
           aria-label="Next"
         >
@@ -133,7 +135,6 @@ export default function ReviewsHighlight() {
             640: { slidesPerView: 2.5, spaceBetween: 10 },
             1024: { slidesPerView: 3.2, spaceBetween: 12 },
           }}
-          className="!overflow-visible"
         >
           {topReviews.map((review) => (
             <SwiperSlide key={review.id} className="!h-auto">

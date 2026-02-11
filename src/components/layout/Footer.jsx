@@ -106,9 +106,9 @@ export default function Footer() {
 
         {/* Payment & Copyright */}
         <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             {paymentIcons.map(name => (
-              <div key={name} className="px-2.5 py-1 bg-gray-800 rounded text-xs text-gray-400 font-medium">
+              <div key={name} className="px-2 py-1 bg-gray-800 rounded text-[11px] text-gray-400 font-medium">
                 {name}
               </div>
             ))}

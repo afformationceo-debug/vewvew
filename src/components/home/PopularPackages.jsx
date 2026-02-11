@@ -25,15 +25,16 @@ export default function PopularPackages() {
         viewAllLink="/packages?sort=popular"
       />
 
-      <div className="relative group/nav">
+      <div className="relative group/nav overflow-hidden">
         <button
           ref={prevRef}
           className={cn(
-            'absolute -left-3 top-1/2 -translate-y-1/2 z-10',
+            'absolute left-0 top-1/2 -translate-y-1/2 z-10',
             'w-8 h-8 rounded-full bg-white shadow-md border border-gray-100',
             'flex items-center justify-center',
             'text-gray-500 hover:text-primary-600',
             'opacity-0 group-hover/nav:opacity-100 transition-opacity',
+            'hidden md:flex',
           )}
           aria-label="Previous"
         >
@@ -43,11 +44,12 @@ export default function PopularPackages() {
         <button
           ref={nextRef}
           className={cn(
-            'absolute -right-3 top-1/2 -translate-y-1/2 z-10',
+            'absolute right-0 top-1/2 -translate-y-1/2 z-10',
             'w-8 h-8 rounded-full bg-white shadow-md border border-gray-100',
             'flex items-center justify-center',
             'text-gray-500 hover:text-primary-600',
             'opacity-0 group-hover/nav:opacity-100 transition-opacity',
+            'hidden md:flex',
           )}
           aria-label="Next"
         >
@@ -75,7 +77,6 @@ export default function PopularPackages() {
             768: { slidesPerView: 3, spaceBetween: 12 },
             1024: { slidesPerView: 3.2, spaceBetween: 14 },
           }}
-          className="!overflow-visible"
         >
           {topPackages.map((pkg, index) => (
             <SwiperSlide key={pkg.id} className="!h-auto">
