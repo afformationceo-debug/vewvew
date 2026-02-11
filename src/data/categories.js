@@ -1,0 +1,138 @@
+export const categories = [
+  {
+    id: "beauty",
+    name: {
+      en: "Beauty Treatments",
+      ko: "뷰티 시술",
+      ja: "美容施術",
+      zh: "美容治疗",
+    },
+    icon: "sparkles",
+    slug: "beauty",
+    description: {
+      en: "Premium non-surgical beauty treatments including fillers, Botox, skin rejuvenation, thread lifts, and hair transplants from Korea's top clinics.",
+      ko: "필러, 보톡스, 피부 리쥬비네이션, 실리프팅, 모발이식 등 한국 최고의 클리닉에서 제공하는 프리미엄 비수술 미용 시술.",
+    },
+    packageCount: 48,
+    badge: "HOT",
+  },
+  {
+    id: "eye",
+    name: {
+      en: "Eye Surgery",
+      ko: "안과 수술",
+      ja: "眼科手術",
+      zh: "眼科手术",
+    },
+    icon: "eye",
+    slug: "eye-surgery",
+    description: {
+      en: "World-class LASIK, LASEK, SMILE, and double eyelid surgery performed by Korea's leading ophthalmologists with the latest laser technology.",
+      ko: "최신 레이저 기술을 갖춘 한국 최고의 안과 전문의가 시행하는 세계적 수준의 라식, 라섹, 스마일, 쌍꺼풀 수술.",
+    },
+    packageCount: 32,
+    badge: null,
+  },
+  {
+    id: "dental",
+    name: {
+      en: "Dental",
+      ko: "치과",
+      ja: "歯科",
+      zh: "牙科",
+    },
+    icon: "smile",
+    slug: "dental",
+    description: {
+      en: "Complete dental care from implants and veneers to whitening and orthodontics. Korea offers top-quality dental work at a fraction of Western prices.",
+      ko: "임플란트, 비니어, 미백, 교정까지 완벽한 치과 진료. 한국에서 서양 대비 합리적인 가격으로 최고 품질의 치과 치료를 받으세요.",
+    },
+    packageCount: 41,
+    badge: "HOT",
+  },
+  {
+    id: "plastic",
+    name: {
+      en: "Plastic Surgery",
+      ko: "성형외과",
+      ja: "美容整形",
+      zh: "整形外科",
+    },
+    icon: "scissors",
+    slug: "plastic-surgery",
+    description: {
+      en: "Korea's globally renowned plastic surgery - rhinoplasty, facelifts, liposuction, and body contouring by board-certified surgeons at JCI-accredited hospitals.",
+      ko: "세계적으로 유명한 한국 성형외과 - JCI 인증 병원의 전문의가 시행하는 코성형, 안면거상술, 지방흡입, 바디윤곽술.",
+    },
+    packageCount: 27,
+    badge: null,
+  },
+  {
+    id: "checkup",
+    name: {
+      en: "Health Checkup",
+      ko: "건강검진",
+      ja: "健康診断",
+      zh: "健康检查",
+    },
+    icon: "heart-pulse",
+    slug: "health-checkup",
+    description: {
+      en: "Comprehensive health screenings at Korea's top hospitals including Samsung Medical Center and Asan Medical Center. Advanced cancer screening with PET-CT available.",
+      ko: "삼성서울병원, 서울아산병원 등 한국 최고의 병원에서 받는 종합 건강검진. PET-CT를 활용한 정밀 암 검진 가능.",
+    },
+    packageCount: 19,
+    badge: "NEW",
+  },
+  {
+    id: "stemcell",
+    name: {
+      en: "Stem Cell / Anti-Aging",
+      ko: "줄기세포 / 안티에이징",
+      ja: "幹細胞 / アンチエイジング",
+      zh: "干细胞 / 抗衰老",
+    },
+    icon: "dna",
+    slug: "stem-cell-anti-aging",
+    description: {
+      en: "Cutting-edge regenerative medicine including stem cell therapy, NK cell immune therapy, and personalized anti-aging programs at Korea's premier longevity centers.",
+      ko: "줄기세포 치료, NK세포 면역치료, 맞춤형 안티에이징 프로그램 등 한국 최고의 장수 센터에서 받는 최첨단 재생의학.",
+    },
+    packageCount: 12,
+    badge: "NEW",
+  },
+  {
+    id: "wellness",
+    name: {
+      en: "Korean Medicine / Wellness",
+      ko: "한방 / 웰니스",
+      ja: "韓方 / ウェルネス",
+      zh: "韩医 / 健康疗养",
+    },
+    icon: "leaf",
+    slug: "korean-medicine-wellness",
+    description: {
+      en: "Traditional Korean medicine, acupuncture, herbal treatments, temple stays, and holistic wellness programs combining ancient wisdom with modern facilities.",
+      ko: "전통 한의학, 침술, 한방 치료, 템플스테이, 고대의 지혜와 현대 시설을 결합한 총체적 웰니스 프로그램.",
+    },
+    packageCount: 23,
+    badge: null,
+  },
+  {
+    id: "vip",
+    name: {
+      en: "Premium VIP",
+      ko: "프리미엄 VIP",
+      ja: "プレミアムVIP",
+      zh: "尊享VIP",
+    },
+    icon: "crown",
+    slug: "premium-vip",
+    description: {
+      en: "Ultimate luxury medical tourism with 24/7 concierge, Royal Suite accommodation, private tours, Michelin star dining, and fully customizable treatment plans.",
+      ko: "24시간 컨시어지, 로얄 스위트 숙박, 프라이빗 투어, 미쉐린 스타 다이닝, 완전 맞춤형 치료 플랜의 최고급 럭셔리 의료관광.",
+    },
+    packageCount: 8,
+    badge: "SALE",
+  },
+];
