@@ -19,6 +19,7 @@ const CartPage = lazy(() => import('./pages/CartPage'));
 const RecentlyViewedPage = lazy(() => import('./pages/RecentlyViewedPage'));
 const EventPage = lazy(() => import('./pages/EventPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
+const CustomTripPage = lazy(() => import('./pages/CustomTripPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function PageLoader() {
@@ -60,6 +61,7 @@ export default function App() {
               <Route path="/recent" element={<RecentlyViewedPage />} />
               <Route path="/events" element={<EventPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/custom-trip" element={<CustomTripPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </AnimatePresence>

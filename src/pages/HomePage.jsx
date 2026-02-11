@@ -1,5 +1,6 @@
 import HeroSection from '../components/home/HeroSection';
 import CategoryGrid from '../components/home/CategoryGrid';
+import TripBuilderSection from '../components/home/TripBuilderSection';
 import CountryConsultSection from '../components/home/CountryConsultSection';
 import PopularPackages from '../components/home/PopularPackages';
 import ExploreByTreatment from '../components/home/ExploreByTreatment';
@@ -13,6 +14,7 @@ export default function HomePage() {
     <div className="pb-16 md:pb-0">
       <HeroSection />
       <section className="max-w-3xl md:max-w-5xl mx-auto px-4 py-5 md:py-6"><CategoryGrid /></section>
+      <section className="max-w-3xl md:max-w-5xl mx-auto px-4 py-5 md:py-6"><TripBuilderSection /></section>
       <section className="max-w-3xl md:max-w-5xl mx-auto px-4 py-1"><CountryConsultSection /></section>
       <section className="max-w-3xl md:max-w-5xl mx-auto px-4 py-5 md:py-6"><PopularPackages /></section>
       <section className="max-w-3xl md:max-w-5xl mx-auto px-4 py-5 md:py-6"><ExploreByTreatment /></section>
